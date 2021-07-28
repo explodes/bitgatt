@@ -9,6 +9,7 @@
 package com.fitbit.bluetooth.fbgatt;
 
 import com.fitbit.bluetooth.fbgatt.util.BluetoothUtils;
+
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -17,7 +18,9 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
+
 import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -90,7 +93,11 @@ class BitgattLeScanner implements ScannerInterface {
             Timber.w("The scanner was null, context or adapter was null");
             return;
         }
-        leScanner.stopScan(callback);
+        try {
+            leScanner.stopScan(callback);
+        } catch (NullPointerException e) {
+            Timber.e(e, "System crash in stopping the  le scan");
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -101,7 +108,11 @@ class BitgattLeScanner implements ScannerInterface {
             Timber.w("The scanner was null, the context or adapter must have been null");
             return;
         }
-        leScanner.stopScan(callbackIntent);
+        try {
+            leScanner.stopScan(callbackIntent);
+        } catch (NullPointerException e) {
+            Timber.e(e, "System crash in stopping the le scan");
+        }
     }
 
     @Override
