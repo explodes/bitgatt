@@ -15,6 +15,7 @@ import static org.mockito.Mockito.spy;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.content.Context;
 import android.os.Looper;
 import androidx.test.core.app.ApplicationProvider;
 import com.fitbit.bluetooth.fbgatt.tx.mocks.SubscribeToCharacteristicNotificationsMockTransaction;
@@ -35,23 +36,17 @@ public class GattNotifyIndicateTest {
 
   @Before
   public void before() {
+    Context context = ApplicationProvider.getApplicationContext();
     BitGattDependencyProvider dependencyProviderSpy = spy(new BitGattDependencyProvider());
     doReturn(mock(PeripheralScanner.class))
         .when(dependencyProviderSpy)
         .getNewPeripheralScanner(any(), any());
-    Looper mainLooper = ApplicationProvider.getApplicationContext().getMainLooper();
+    Looper mainLooper = context.getMainLooper();
     device = mock(FitbitBluetoothDevice.class);
     conn = spy(new GattConnection(device, mainLooper));
     conn.setMockMode(true);
     FitbitGatt.getInstance().putConnectionIntoDevices(device, conn);
-    GattServerConnection serverConnection = spy(new GattServerConnection(null, mainLooper));
-    serverConnection.setMockMode(true);
-    conn.setState(GattState.IDLE);
-    serverConnection.setState(GattState.IDLE);
-    FitbitGatt.getInstance().setDependencyProvider(dependencyProviderSpy);
-    FitbitGatt.getInstance().setAsyncOperationThreadWatchdog(mock(LooperWatchdog.class));
-    FitbitGatt.getInstance().startGattServer(ApplicationProvider.getApplicationContext());
-    FitbitGatt.getInstance().setGattServerConnection(serverConnection);
+    FitbitGatt.getInstance().startGattClient(context);
   }
 
   @Test
