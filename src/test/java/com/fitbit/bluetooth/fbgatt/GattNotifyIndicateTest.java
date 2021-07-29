@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(minSdk = 21)
@@ -41,7 +42,7 @@ public class GattNotifyIndicateTest {
     doReturn(mock(PeripheralScanner.class))
         .when(dependencyProviderSpy)
         .getNewPeripheralScanner(any(), any());
-    Looper mainLooper = context.getMainLooper();
+    Looper mainLooper = Looper.getMainLooper();
     device = mock(FitbitBluetoothDevice.class);
     conn = spy(new GattConnection(device, mainLooper));
     conn.setMockMode(true);
