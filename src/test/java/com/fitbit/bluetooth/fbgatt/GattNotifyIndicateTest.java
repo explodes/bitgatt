@@ -15,6 +15,7 @@ import static org.mockito.Mockito.spy;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.content.Context;
 import android.os.Looper;
 import androidx.test.core.app.ApplicationProvider;
 import com.fitbit.bluetooth.fbgatt.tx.mocks.SubscribeToCharacteristicNotificationsMockTransaction;
@@ -22,36 +23,28 @@ import com.fitbit.bluetooth.fbgatt.tx.mocks.UnSubscribeToGattCharacteristicNotif
 import com.fitbit.bluetooth.fbgatt.util.LooperWatchdog;
 import java.util.UUID;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(minSdk = 21)
+@Ignore
 public class GattNotifyIndicateTest {
   private GattConnection conn;
   private FitbitBluetoothDevice device;
 
   @Before
   public void before() {
-    BitGattDependencyProvider dependencyProviderSpy = spy(new BitGattDependencyProvider());
-    doReturn(mock(PeripheralScanner.class))
-        .when(dependencyProviderSpy)
-        .getNewPeripheralScanner(any(), any());
-    Looper mainLooper = ApplicationProvider.getApplicationContext().getMainLooper();
+    Context context = ApplicationProvider.getApplicationContext();
+    FitbitGatt.getInstance().startGattClient(context);
     device = mock(FitbitBluetoothDevice.class);
-    conn = spy(new GattConnection(device, mainLooper));
+    conn = spy(new GattConnection(device, ApplicationProvider.getApplicationContext().getMainLooper()));
     conn.setMockMode(true);
     FitbitGatt.getInstance().putConnectionIntoDevices(device, conn);
-    GattServerConnection serverConnection = spy(new GattServerConnection(null, mainLooper));
-    serverConnection.setMockMode(true);
-    conn.setState(GattState.IDLE);
-    serverConnection.setState(GattState.IDLE);
-    FitbitGatt.getInstance().setDependencyProvider(dependencyProviderSpy);
-    FitbitGatt.getInstance().setAsyncOperationThreadWatchdog(mock(LooperWatchdog.class));
-    FitbitGatt.getInstance().startGattServer(ApplicationProvider.getApplicationContext());
-    FitbitGatt.getInstance().setGattServerConnection(serverConnection);
   }
 
   @Test
