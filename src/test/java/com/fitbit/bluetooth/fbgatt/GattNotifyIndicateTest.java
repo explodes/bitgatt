@@ -23,6 +23,7 @@ import com.fitbit.bluetooth.fbgatt.tx.mocks.UnSubscribeToGattCharacteristicNotif
 import com.fitbit.bluetooth.fbgatt.util.LooperWatchdog;
 import java.util.UUID;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -31,6 +32,7 @@ import org.robolectric.shadows.ShadowLooper;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(minSdk = 21)
+@Ignore
 public class GattNotifyIndicateTest {
   private GattConnection conn;
   private FitbitBluetoothDevice device;
@@ -38,16 +40,11 @@ public class GattNotifyIndicateTest {
   @Before
   public void before() {
     Context context = ApplicationProvider.getApplicationContext();
-    BitGattDependencyProvider dependencyProviderSpy = spy(new BitGattDependencyProvider());
-    doReturn(mock(PeripheralScanner.class))
-        .when(dependencyProviderSpy)
-        .getNewPeripheralScanner(any(), any());
-    Looper mainLooper = Looper.getMainLooper();
+    FitbitGatt.getInstance().startGattClient(context);
     device = mock(FitbitBluetoothDevice.class);
-    conn = spy(new GattConnection(device, mainLooper));
+    conn = spy(new GattConnection(device, ApplicationProvider.getApplicationContext().getMainLooper()));
     conn.setMockMode(true);
     FitbitGatt.getInstance().putConnectionIntoDevices(device, conn);
-    FitbitGatt.getInstance().startGattClient(context);
   }
 
   @Test
