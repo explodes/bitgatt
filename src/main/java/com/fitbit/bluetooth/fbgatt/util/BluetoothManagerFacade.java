@@ -39,7 +39,7 @@ public class BluetoothManagerFacade {
         return BluetoothAdapter.getDefaultAdapter();
     }
 
-    public List<BluetoothDevice> getConnectedDevices(int profile) {
+    public @Nullable List<BluetoothDevice> getConnectedDevices(int profile) {
         if(manager == null) {
             return  null;
         }
