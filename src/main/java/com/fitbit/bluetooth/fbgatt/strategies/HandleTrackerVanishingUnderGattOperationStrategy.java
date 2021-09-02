@@ -34,7 +34,7 @@ public class HandleTrackerVanishingUnderGattOperationStrategy extends Strategy {
     @Override
     public void applyStrategy() {
         Timber.d("Applying tracker vanishing while in gatt operation strategy");
-        if(connection != null) {
+        if (connection != null) {
             connection.setState(GattState.DISCONNECTING);
             BluetoothGatt localGatt = connection.getGatt();
             if(localGatt != null) {
@@ -47,7 +47,7 @@ public class HandleTrackerVanishingUnderGattOperationStrategy extends Strategy {
         // so in this scenario we will have to wait for the client_if to dump for sure,
         // at least 1s on pixel
         Timber.v("Waiting %dms for the client_if to dump", WAIT_TIME_FOR_DISCONNECTION);
-        if(connection != null) {
+        if (connection != null) {
             connection.getMainHandler().postDelayed(() -> {
                 connection.setState(GattState.DISCONNECTED);
                 if (FitbitGatt.getInstance().getServer() != null) {

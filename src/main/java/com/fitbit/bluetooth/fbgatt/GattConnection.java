@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RestrictTo;
 import androidx.annotation.VisibleForTesting;
 import timber.log.Timber;
 import static com.fitbit.bluetooth.fbgatt.FitbitGatt.atLeastSDK;
@@ -457,6 +458,7 @@ public class GattConnection implements Closeable {
              * {@link GattState.DISCONNECTING} until that is complete ...
              */
             try {
+                setState(GattState.DISCONNECTING);
                 localGatt.disconnect();
             } catch (NullPointerException e) {
                 // this means that the hardware's underlying connection went away while
@@ -465,8 +467,8 @@ public class GattConnection implements Closeable {
                 // anything though, if this NPEs it means that the connection is already
                 // cancelled ... there is nothing there to cancel
                 Timber.e(e, "[%s] OS Stack Failure while disconnecting", getDevice());
+                setState(GattState.DISCONNECTED);
             }
-            setState(GattState.DISCONNECTING);
         }
     }
 
@@ -637,5 +639,10 @@ public class GattConnection implements Closeable {
             // by the Android OS
             Timber.e(e, "[%s] Ran into OS Stack NPE", getDevice());
         }
+    }
+
+    @RestrictTo(RestrictTo.Scope.TESTS)
+    void  injectGattConnect(BluetoothGatt injectedGatt) {
+        this.gatt = injectedGatt;
     }
 }

@@ -41,7 +41,6 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(minSdk = 21)
-@Ignore("We need to be able to run transactions under robolectric")
 public class GattConnectionTest {
 
     private static final String MOCK_ADDRESS = "02:00:00:00:00:00";
@@ -57,8 +56,7 @@ public class GattConnectionTest {
         FitbitGatt instance = FitbitGatt.getInstance();
 
         instance.start(context);
-        instance.getServer().setMockMode(true);
-
+        instance.setGattServerConnection(serverConnection);
         Looper mockLooper = context.getMainLooper();
         FitbitBluetoothDevice fitbitDeviceMock = mock(FitbitBluetoothDevice.class);
         doReturn(MOCK_ADDRESS).when(fitbitDeviceMock).getAddress();
@@ -76,6 +74,7 @@ public class GattConnectionTest {
     }
 
     @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void testRemovingGattConnectionEventListeners(){
         ConnectionEventListener listener = new ConnectionEventListener() {
             @Override
@@ -110,6 +109,7 @@ public class GattConnectionTest {
     }
 
     @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void testRemovingGattServerConnectionEventListeners(){
         ServerConnectionEventListener listener = new ServerConnectionEventListener() {
             @Override
@@ -148,6 +148,7 @@ public class GattConnectionTest {
     }
 
     @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void gattClientEventListenerShouldRegisterOne(){
 
         GattClientListener listener = new GattClientListener() {
@@ -226,6 +227,7 @@ public class GattConnectionTest {
     }
 
     @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void gattClientEventListenerShouldReceiveCallback(){
         BluetoothDevice bluetoothDevice = ShadowBluetoothDevice.newInstance(MOCK_ADDRESS);
         BluetoothGatt gatt = ShadowBluetoothGatt.newInstance(bluetoothDevice);
@@ -306,6 +308,7 @@ public class GattConnectionTest {
     }
 
     @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void testNullEventListenerCrashes() {
         try {
             connection.registerConnectionEventListener(null);
@@ -336,7 +339,28 @@ public class GattConnectionTest {
         }
     }
 
+
     @Test
+    public void testHandleDisconnectNoGatt() {
+        connection.setMockMode(false);
+        connection.setState(GattState.DISCOVERING);
+        connection.injectGattConnect(null);
+        connection.disconnect();
+        assertSame(GattState.DISCONNECTED, connection.getGattState());
+    }
+
+    @Test
+    public void testHandleDisconnectGatt() {
+        BluetoothDevice device =ShadowBluetoothDevice.newInstance("02:00:00:00:00:00");
+        BluetoothGatt gatt = ShadowBluetoothGatt.newInstance(device);
+        connection.injectGattConnect(gatt);
+        connection.setState(GattState.CONNECTED);
+        connection.disconnect();
+        assertSame(GattState.DISCONNECTING, connection.getGattState());
+    }
+
+    @Test
+    @Ignore("We need to be able to run transactions under robolectric")
     public void testHighlyConcurrentAccess() {
         List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -391,4 +415,6 @@ public class GattConnectionTest {
             }
         };
     }
+
+
 }
