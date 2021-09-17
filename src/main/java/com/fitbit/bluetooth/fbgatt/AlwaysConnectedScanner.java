@@ -97,6 +97,10 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
      */
     private Handler mainHandlerForScheduling;
     /**
+     * Instance of the FitbitGatt as this won't change over the lifecycle of this object
+     */
+    private final FitbitGatt fitbitGatt = FitbitGatt.getInstance();
+    /**
      * Test mode high priority scan time, shouldn't be used for production purposes
      */
     @VisibleForTesting
@@ -270,13 +274,13 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
      */
     public synchronized void addScanFilters(@NonNull Context context, @NonNull List<ScanFilter> filters) {
         scanFilters.addAll(filters);
-        if (FitbitGatt.getInstance().getPeripheralScanner() != null) {
-            FitbitGatt.getInstance().getPeripheralScanner().setScanFilters(scanFilters);
+        if (fitbitGatt.getPeripheralScanner() != null) {
+            fitbitGatt.getPeripheralScanner().setScanFilters(scanFilters);
         }
         // let's only change this once per scan too much warn interval
         mainHandlerForScheduling.postDelayed(() -> {
-            FitbitGatt.getInstance().getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
-            FitbitGatt.getInstance().getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
+            fitbitGatt.getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
+            fitbitGatt.getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
         }, PeripheralScanner.SCAN_TOO_MUCH_WARN_INTERVAL);
     }
 
@@ -297,13 +301,13 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
         if (!scanFilters.contains(scanFilter)) {
             scanFilters.add(scanFilter);
         }
-        if (FitbitGatt.getInstance().getPeripheralScanner() != null) {
-            FitbitGatt.getInstance().getPeripheralScanner().setScanFilters(scanFilters);
+        if (fitbitGatt.getPeripheralScanner() != null) {
+            fitbitGatt.getPeripheralScanner().setScanFilters(scanFilters);
         }
         // let's only change this once per scan too much warn interval
         mainHandlerForScheduling.postDelayed(() -> {
-            FitbitGatt.getInstance().getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
-            FitbitGatt.getInstance().getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
+            fitbitGatt.getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
+            fitbitGatt.getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
         }, PeripheralScanner.SCAN_TOO_MUCH_WARN_INTERVAL);
     }
 
@@ -322,13 +326,13 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
         if (!scanFilters.contains(scanFilter)) {
             scanFilters.remove(scanFilter);
         }
-        if (FitbitGatt.getInstance().getPeripheralScanner() != null) {
-            FitbitGatt.getInstance().getPeripheralScanner().setScanFilters(scanFilters);
+        if (fitbitGatt.getPeripheralScanner() != null) {
+            fitbitGatt.getPeripheralScanner().setScanFilters(scanFilters);
         }
         // let's only change this once per scan too much warn interval
         mainHandlerForScheduling.postDelayed(() -> {
-            FitbitGatt.getInstance().getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
-            FitbitGatt.getInstance().getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
+            fitbitGatt.getPeripheralScanner().cancelPendingIntentBasedBackgroundScan();
+            fitbitGatt.getPeripheralScanner().startPendingIntentBasedBackgroundScan(scanFilters, context);
         }, PeripheralScanner.SCAN_TOO_MUCH_WARN_INTERVAL);
     }
 
@@ -341,7 +345,7 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
      */
 
     public boolean start(@NonNull Context context) {
-        scanner = FitbitGatt.getInstance().getPeripheralScanner();
+        scanner = fitbitGatt.getPeripheralScanner();
         if (scanner == null) {
             Timber.w("The scanner isn't set up yet, did you call FitbitGatt#start(...)?");
             return false;
@@ -358,14 +362,14 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
             Timber.w("The scanner was already enabled, no need to call this again");
             return false;
         }
-        FitbitGatt.getInstance().registerGattEventListener(this);
+        fitbitGatt.registerGattEventListener(this);
         return startBackgroundScanning(context);
     }
 
     private boolean startBackgroundScanning(@NonNull Context context) {
         // we only want to start a pending intent scan if this is > Oreo MR1
         // otherwise we'll use the pending intent scan
-        PeripheralScanner peripheralScanner = FitbitGatt.getInstance().getPeripheralScanner();
+        PeripheralScanner peripheralScanner = fitbitGatt.getPeripheralScanner();
         if (peripheralScanner == null) {
             Timber.w("The scanner isn't set up yet, did you call FitbitGatt#start(...)?");
             return false;
@@ -386,7 +390,7 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
 
     private void stopScanningUntilDisconnectionEvent(Context context) {
         if (isAlwaysConnectedScannerEnabled()) {
-            PeripheralScanner peripheralScanner = FitbitGatt.getInstance().getPeripheralScanner();
+            PeripheralScanner peripheralScanner = fitbitGatt.getPeripheralScanner();
             if (peripheralScanner != null) {
                 if (FitbitGatt.atLeastSDK(Build.VERSION_CODES.O_MR1)) {
                     peripheralScanner.cancelPendingIntentBasedBackgroundScan();
@@ -406,7 +410,7 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
 
     private boolean continueBackgroundScanning(@NonNull Context context) {
         if (isAlwaysConnectedScannerEnabled()) {
-            PeripheralScanner peripheralScanner = FitbitGatt.getInstance().getPeripheralScanner();
+            PeripheralScanner peripheralScanner = fitbitGatt.getPeripheralScanner();
             if (peripheralScanner != null) {
                 if (FitbitGatt.atLeastSDK(Build.VERSION_CODES.O_MR1)) {
                     return peripheralScanner.startPendingIntentBasedBackgroundScan(scanFilters, context);
@@ -454,7 +458,7 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
     }
 
     private boolean startScanIfPossible(@NonNull Context context) {
-        PeripheralScanner peripheralScanner = FitbitGatt.getInstance().getPeripheralScanner();
+        PeripheralScanner peripheralScanner = fitbitGatt.getPeripheralScanner();
         if (peripheralScanner == null) {
             Timber.w("The scanner isn't set up yet, did you call FitbitGatt#start(...)?");
             return false;
@@ -481,8 +485,8 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
 
     public void stop(@NonNull Context context) {
         // will stop the always connected scanner
-        FitbitGatt.getInstance().unregisterGattEventListener(this);
-        PeripheralScanner peripheralScanner = FitbitGatt.getInstance().getPeripheralScanner();
+        fitbitGatt.unregisterGattEventListener(this);
+        PeripheralScanner peripheralScanner = fitbitGatt.getPeripheralScanner();
         if (peripheralScanner != null) {
             peripheralScanner.cancelScan(context);
             peripheralScanner.cancelPendingIntentBasedBackgroundScan();
@@ -500,7 +504,7 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
     @Override
     public void onBluetoothPeripheralDiscovered(GattConnection connection) {
         // we've discovered a device that is matching, let's try to connect
-        Context appContext = FitbitGatt.getInstance().getAppContext();
+        Context appContext = fitbitGatt.getAppContext();
         if (appContext != null) {
             // well, we will try to connect and evaluate the device against our filters.  If it
             // matches, then we will leave it connected, otherwise we will release the client_if
@@ -585,8 +589,8 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
             int matchingDevices = numberOfMatchingConnectedDevices.get();
             if (numberOfExpectedDevices > 1 && matchingDevices < numberOfExpectedDevices) {
                 Timber.v("Dropped below the number of expected devices, so we should start scanning again");
-                if (FitbitGatt.getInstance().getAppContext() != null) {
-                    boolean didStart = continueBackgroundScanning(FitbitGatt.getInstance().getAppContext());
+                if (fitbitGatt.getAppContext() != null) {
+                    boolean didStart = continueBackgroundScanning(fitbitGatt.getAppContext());
                     if (!didStart) {
                         Timber.w("Always connected scanner tried to start scanning but failed");
                     }
@@ -615,8 +619,8 @@ public class AlwaysConnectedScanner implements FitbitGatt.FitbitGattCallback {
     public void onPendingIntentScanStopped() {
         // bluetooth on means that we should restart our pending intent scan if it is not already
         // in operation
-        if (FitbitGatt.getInstance().getAppContext() != null) {
-            startBackgroundScanning(FitbitGatt.getInstance().getAppContext());
+        if (fitbitGatt.getAppContext() != null) {
+            startBackgroundScanning(fitbitGatt.getAppContext());
         } else {
             Timber.w("Couldn't resume scans because context is null");
         }

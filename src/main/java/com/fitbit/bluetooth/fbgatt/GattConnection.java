@@ -51,6 +51,7 @@ public class GattConnection implements Closeable {
     private TransactionQueueController clientQueue;
     private AtomicLong intraTransactionDelay = new AtomicLong(0);
     private @NonNull Handler mainHandler;
+    private final FitbitGatt fitbitGatt = FitbitGatt.getInstance();
 
     public GattConnection(FitbitBluetoothDevice device, Looper mainLooper) {
         this.device = device;
@@ -148,8 +149,8 @@ public class GattConnection implements Closeable {
      */
     @SuppressWarnings("WeakerAccess") // API Method
     public void registerGattClientListener(GattClientListener clientListener) {
-        if (FitbitGatt.getInstance().getClientCallback() != null) {
-            FitbitGatt.getInstance().getClientCallback().addListener(clientListener);
+        if (fitbitGatt.getClientCallback() != null) {
+            fitbitGatt.getClientCallback().addListener(clientListener);
         } else {
             Timber.w("[%s] The client callback was null, something is quite wrong", getDevice());
         }
@@ -162,8 +163,8 @@ public class GattConnection implements Closeable {
      */
     @SuppressWarnings("WeakerAccess") // API Method
     public void unregisterGattClientListener(GattClientListener clientListener) {
-        if (FitbitGatt.getInstance().getClientCallback() != null) {
-            FitbitGatt.getInstance().getClientCallback().removeListener(clientListener);
+        if (fitbitGatt.getClientCallback() != null) {
+            fitbitGatt.getClientCallback().removeListener(clientListener);
         } else {
             Timber.w("[%s] The client callback was null, something is quite wrong", getDevice());
         }
@@ -185,7 +186,7 @@ public class GattConnection implements Closeable {
      */
 
     public synchronized void setState(GattState state) {
-        if (FitbitGatt.getInstance().isSlowLoggingEnabled()) {
+        if (fitbitGatt.isSlowLoggingEnabled()) {
             Timber.v("[%s] Transitioning from state %s to state %s", getDevice(), this.state.name(), state.name());
         }
         this.state = state;
@@ -353,7 +354,7 @@ public class GattConnection implements Closeable {
     }
 
     private boolean connectionInstanceAlreadyExists(FitbitBluetoothDevice device) {
-        GattConnection cachedConnection = FitbitGatt.getInstance().getConnectionMap().get(device);
+        GattConnection cachedConnection = fitbitGatt.getConnectionMap().get(device);
         if (cachedConnection != null && !cachedConnection.equals(this)) {
             Timber.w("[%s] You are trying to connect but there is already a connection available for it.  We are saving you from creating too many client_ifs #developerlove.", device);
             return true;
@@ -405,7 +406,7 @@ public class GattConnection implements Closeable {
         }
         if (atLeastSDK(Build.VERSION_CODES.M)) {
             try {
-                gatt = device.getBtDevice().connectGatt(FitbitGatt.getInstance().getAppContext(), false, FitbitGatt.getInstance().getClientCallback(), BluetoothDevice.TRANSPORT_LE);
+                gatt = device.getBtDevice().connectGatt(fitbitGatt.getAppContext(), false, fitbitGatt.getClientCallback(), BluetoothDevice.TRANSPORT_LE);
             } catch (NullPointerException e) {
                 Timber.e(e);
                 //This crash can be seen mainly on some low end devices such as P20 Lite or A5
@@ -413,7 +414,7 @@ public class GattConnection implements Closeable {
                 return false;
             }
         } else {
-            gatt = device.getBtDevice().connectGatt(FitbitGatt.getInstance().getAppContext(), false, FitbitGatt.getInstance().getClientCallback());
+            gatt = device.getBtDevice().connectGatt(fitbitGatt.getAppContext(), false, fitbitGatt.getClientCallback());
         }
         if (gatt == null) {
             setState(GattState.FAILURE_CONNECTING);
@@ -427,15 +428,15 @@ public class GattConnection implements Closeable {
     private void mockConnect() {
         Timber.i("[%s] Mock connecting!!!!", getDevice());
         setState(GattState.CONNECTING);
-        mainHandler.postDelayed(() -> FitbitGatt.getInstance().getClientCallback().
+        mainHandler.postDelayed(() -> fitbitGatt.getClientCallback().
                 onConnectionStateChange(null, BluetoothGatt.GATT_SUCCESS, BluetoothProfile.STATE_CONNECTED), 1499);
-        FitbitGatt.getInstance().putConnectionIntoDevices(device, this);
+        fitbitGatt.putConnectionIntoDevices(device, this);
     }
 
     private void mockDisconnect() {
         Timber.i("[%s] Mock disconnecting!!!", getDevice());
         setState(GattState.DISCONNECTING);
-        mainHandler.postDelayed(() -> FitbitGatt.getInstance().getClientCallback().onConnectionStateChange(null, BluetoothGatt.GATT_SUCCESS, BluetoothProfile.STATE_DISCONNECTED), 150);
+        mainHandler.postDelayed(() -> fitbitGatt.getClientCallback().onConnectionStateChange(null, BluetoothGatt.GATT_SUCCESS, BluetoothProfile.STATE_DISCONNECTED), 150);
     }
 
     /**

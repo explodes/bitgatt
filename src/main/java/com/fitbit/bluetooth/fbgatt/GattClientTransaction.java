@@ -24,6 +24,7 @@ import timber.log.Timber;
  * {@link GattClientTransaction} registration lifecycle
  */
 public class GattClientTransaction extends GattTransaction<GattClientTransaction> implements GattClientListener {
+    private final FitbitGatt fitbitGatt = FitbitGatt.getInstance();
     private final GattUtils utils = new GattUtils();
     private final GattConnection connection;
 
@@ -95,7 +96,7 @@ public class GattClientTransaction extends GattTransaction<GattClientTransaction
 
     @Override
     protected void unregisterListener(GattClientTransaction tx) {
-        GattClientCallback gattClientCallback = FitbitGatt.getInstance().getClientCallback();
+        GattClientCallback gattClientCallback = fitbitGatt.getClientCallback();
         if (gattClientCallback != null) {
             gattClientCallback.removeListener(tx);
         }
@@ -103,7 +104,7 @@ public class GattClientTransaction extends GattTransaction<GattClientTransaction
 
     @Override
     protected void registerListener(GattClientTransaction tx) {
-        GattClientCallback gattClientCallback = FitbitGatt.getInstance().getClientCallback();
+        GattClientCallback gattClientCallback = fitbitGatt.getClientCallback();
         if (gattClientCallback != null) {
             gattClientCallback.addListener(tx);
         }
@@ -149,21 +150,21 @@ public class GattClientTransaction extends GattTransaction<GattClientTransaction
 
     @Override
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristicCopy characteristic, int status) {
-        if (FitbitGatt.getInstance().isSlowLoggingEnabled()) {
+        if (fitbitGatt.isSlowLoggingEnabled()) {
             Timber.v("[%s] onCharacteristicRead not handled in tx: %s", utils.debugSafeGetBtDeviceName(gatt), getName());
         }
     }
 
     @Override
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristicCopy characteristic, int status) {
-        if (FitbitGatt.getInstance().isSlowLoggingEnabled()) {
+        if (fitbitGatt.isSlowLoggingEnabled()) {
             Timber.v("[%s] onCharacteristicWrite not handled in tx: %s", utils.debugSafeGetBtDeviceName(gatt), getName());
         }
     }
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristicCopy characteristic) {
-        if (FitbitGatt.getInstance().isSlowLoggingEnabled()) {
+        if (fitbitGatt.isSlowLoggingEnabled()) {
             Timber.v("[%s] onCharacteristicChanged not handled in tx: %s", utils.debugSafeGetBtDeviceName(gatt), getName());
         }
     }
