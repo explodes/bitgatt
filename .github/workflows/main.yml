@@ -25,3 +25,4 @@ jobs:
           name: code-coverage-report
           path: build/reports/tests/testDebugUnitTest/index.html
           retention-days: 1
+        if: ${{ always() }} # IMPORTANT: run always regardless of previous jobs status
