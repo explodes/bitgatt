@@ -8,13 +8,6 @@
 
 package com.fitbit.bluetooth.fbgatt;
 
-import com.fitbit.bluetooth.fbgatt.btcopies.BluetoothGattCharacteristicCopy;
-import com.fitbit.bluetooth.fbgatt.btcopies.BluetoothGattDescriptorCopy;
-import com.fitbit.bluetooth.fbgatt.tx.GattClientDiscoverServicesTransaction;
-import com.fitbit.bluetooth.fbgatt.tx.RequestGattClientPhyChangeTransaction;
-import com.fitbit.bluetooth.fbgatt.tx.RequestMtuGattTransaction;
-import com.fitbit.bluetooth.fbgatt.util.GattStatus;
-import com.fitbit.bluetooth.fbgatt.util.GattUtils;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -24,6 +17,13 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.os.Handler;
 import android.os.Looper;
+import com.fitbit.bluetooth.fbgatt.btcopies.BluetoothGattCharacteristicCopy;
+import com.fitbit.bluetooth.fbgatt.btcopies.BluetoothGattDescriptorCopy;
+import com.fitbit.bluetooth.fbgatt.tx.GattClientDiscoverServicesTransaction;
+import com.fitbit.bluetooth.fbgatt.tx.RequestGattClientPhyChangeTransaction;
+import com.fitbit.bluetooth.fbgatt.tx.RequestMtuGattTransaction;
+import com.fitbit.bluetooth.fbgatt.util.GattStatus;
+import com.fitbit.bluetooth.fbgatt.util.GattUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -90,8 +90,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     @Override
     public void onPhyUpdate(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
         super.onPhyUpdate(gatt, txPhy, rxPhy, status);
-        Timber.v("[%s] onPhyUpdate: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-        Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+        Timber.v(
+                "[%s] onPhyUpdate: Gatt Response Status %s",
+                getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+        Timber.d(
+                "[%s][Threading] Originally called on thread : %s",
+                getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         if (gatt == null) {
             return;
         }
@@ -119,11 +123,11 @@ public class GattClientCallback extends BluetoothGattCallback {
                         builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
                     }
                     asyncConnListener.onPhyChanged(builder
-                        .transactionName(RequestGattClientPhyChangeTransaction.NAME)
-                        .txPhy(txPhy)
-                        .rxPhy(rxPhy)
-                        .gattState(conn.getGattState())
-                        .responseStatus(GattDisconnectReason.getReasonForCode(status).ordinal()).build(), conn);
+                            .transactionName(RequestGattClientPhyChangeTransaction.NAME)
+                            .txPhy(txPhy)
+                            .rxPhy(rxPhy)
+                            .gattState(conn.getGattState())
+                            .responseStatus(GattDisconnectReason.getReasonForCode(status).ordinal()).build(), conn);
                 }
             });
         }
@@ -132,8 +136,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     @Override
     public void onPhyRead(BluetoothGatt gatt, int txPhy, int rxPhy, int status) {
         super.onPhyRead(gatt, txPhy, rxPhy, status);
-        Timber.v("[%s] onPhyRead: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-        Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+        Timber.v(
+                "[%s] onPhyRead: Gatt Response Status %s",
+                getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+        Timber.d(
+                "[%s][Threading] Originally called on thread : %s",
+                getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         if (gatt == null) {
             return;
         }
@@ -151,9 +159,16 @@ public class GattClientCallback extends BluetoothGattCallback {
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         super.onConnectionStateChange(gatt, status, newState);
-        Timber.v("[%s] onConnectionStateChange: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-        Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
-        Timber.d("[%s]Connection state: %s", getDeviceMacFromGatt(gatt), newState == BluetoothProfile.STATE_CONNECTED ? "Connected" : "Not-Connected");
+        Timber.v(
+                "[%s] onConnectionStateChange: Gatt Response Status %s",
+                getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+        Timber.d(
+                "[%s][Threading] Originally called on thread : %s",
+                getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+        Timber.d(
+                "[%s]Connection state: %s",
+                getDeviceMacFromGatt(gatt),
+                newState == BluetoothProfile.STATE_CONNECTED ? "Connected" : "Not-Connected");
         if(status != BluetoothGatt.GATT_SUCCESS) {
             Timber.i("[%s] The connection state may have changed in error", getDeviceMacFromGatt(gatt));
         }
@@ -162,11 +177,17 @@ public class GattClientCallback extends BluetoothGattCallback {
         if(gatt != null) {
             conn = fitbitGatt.getConnection(gatt.getDevice());
             if(conn == null) {
-                Timber.i("[%s] The instance that is receiving this callback for device %s is not in the map, ignoring",getDeviceMacFromGatt(gatt), gatt.getDevice());
+                Timber.i(
+                        "[%s] The instance that is receiving this callback for device %s is not in the map,"
+                                + " ignoring",
+                        getDeviceMacFromGatt(gatt), gatt.getDevice());
                 return;
             }
         } else {
-            Timber.v("[%s] If GATT is null here, this must be a mock, otherwise there is a quite serious error", getDeviceMacFromGatt(gatt));
+            Timber.v(
+                    "[%s] If GATT is null here, this must be a mock, otherwise there is a quite serious"
+                            + " error",
+                    getDeviceMacFromGatt(gatt));
             FitbitBluetoothDevice device = new FitbitBluetoothDevice("02:00:00:00:00:00", "fooDevice");
             conn = new GattConnection(device, handler.getLooper());
             fitbitGatt.putConnectionIntoDevices(device, conn);
@@ -174,7 +195,9 @@ public class GattClientCallback extends BluetoothGattCallback {
         switch(newState) {
             case BluetoothProfile.STATE_DISCONNECTING: // never called by android
             case BluetoothProfile.STATE_DISCONNECTED:
-                Timber.d("[%s] Disconnection reason: %s", getDeviceMacFromGatt(gatt), GattDisconnectReason.getReasonForCode(newState));
+                Timber.d(
+                        "[%s] Disconnection reason: %s",
+                        getDeviceMacFromGatt(gatt), GattDisconnectReason.getReasonForCode(newState));
                 /*
                  * this is tricky, once we get here, the tracker has disconnected, but we still must
                  * wait for supervision timeout length until we can connect again, so we will force
@@ -194,7 +217,9 @@ public class GattClientCallback extends BluetoothGattCallback {
                  * arbitrary, however we want for it to be less than the 60s timeout on a transaction
                  */
                 if(gatt != null) {
-                    Timber.w("[%s] disconnected, waiting %dms for full disconnection", getDeviceMacFromGatt(gatt), HOT_QUEUE_EMPTYING_TIME);
+                    Timber.w(
+                            "[%s] disconnected, waiting %dms for full disconnection",
+                            getDeviceMacFromGatt(gatt), HOT_QUEUE_EMPTYING_TIME);
                     conn.setState(GattState.DISCONNECTING);
                     /*
                      * This is required so that we can cancel the connection attempt if one was pending
@@ -247,27 +272,34 @@ public class GattClientCallback extends BluetoothGattCallback {
             case BluetoothProfile.STATE_CONNECTED:
                 ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
                 copy.addAll(listeners);
-                handler.post(() -> {
-                    for (GattClientListener listener : copy) {
-                        if (gatt == null) {
-                            listener.onConnectionStateChange(null, status, BluetoothProfile.STATE_CONNECTED);
-                        } else if (listener.getDevice() != null && listener.getDevice().equals(gatt.getDevice())) {
-                            listener.onConnectionStateChange(gatt, status, BluetoothProfile.STATE_CONNECTED);
-                        } else {
-                            Timber.v("[%s] We should never get here, but if we do it is not an exception", getDeviceMacFromGatt(gatt));
-                        }
-                    }
-                    // since this is one of the events that could happen asynchronously, we will
-                    // need to iterate through our connection listeners, since this is a disconnection
-                    // we will want to report success so that upstream consumers don't get confused,
-                    // or mixed signals on a connection attempt
-                    for (ConnectionEventListener asyncConnListener : conn.getConnectionEventListeners()) {
-                        asyncConnListener.onClientConnectionStateChanged(new TransactionResult.Builder()
-                                .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS)
-                                .gattState(conn.getGattState())
-                                .responseStatus(GattDisconnectReason.getReasonForCode(status).ordinal()).build(), conn);
-                    }
-                });
+                handler.post(
+                        () -> {
+                            for (GattClientListener listener : copy) {
+                                if (gatt == null) {
+                                    listener.onConnectionStateChange(null, status, BluetoothProfile.STATE_CONNECTED);
+                                } else if (listener.getDevice() != null
+                                        && listener.getDevice().equals(gatt.getDevice())) {
+                                    listener.onConnectionStateChange(gatt, status, BluetoothProfile.STATE_CONNECTED);
+                                } else {
+                                    Timber.v(
+                                            "[%s] We should never get here, but if we do it is not an exception",
+                                            getDeviceMacFromGatt(gatt));
+                                }
+                            }
+                            // since this is one of the events that could happen asynchronously, we will
+                            // need to iterate through our connection listeners, since this is a disconnection
+                            // we will want to report success so that upstream consumers don't get confused,
+                            // or mixed signals on a connection attempt
+                            for (ConnectionEventListener asyncConnListener : conn.getConnectionEventListeners()) {
+                                asyncConnListener.onClientConnectionStateChanged(
+                                        new TransactionResult.Builder()
+                                                .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS)
+                                                .gattState(conn.getGattState())
+                                                .responseStatus(GattDisconnectReason.getReasonForCode(status).ordinal())
+                                                .build(),
+                                        conn);
+                            }
+                        });
 
                 break;
             default:
@@ -280,21 +312,30 @@ public class GattClientCallback extends BluetoothGattCallback {
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         super.onServicesDiscovered(gatt, status);
-        Timber.v("[%s] onServicesDiscovered: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-        Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+        Timber.v(
+                "[%s] onServicesDiscovered: Gatt Response Status %s",
+                getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+        Timber.d(
+                "[%s][Threading] Originally called on thread : %s",
+                getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
+        GattConnection conn = fitbitGatt.getConnection(gatt.getDevice());
+        List<BluetoothGattService> discoveredServices = new ArrayList<>();
+        if (conn != null) {
+            discoveredServices.addAll(gatt.getServices());
+        }
         handler.post(() -> {
             for (GattClientListener listener : copy) {
                 if (listener.getDevice() != null && listener.getDevice().equals(gatt.getDevice())) {
                     listener.onServicesDiscovered(gatt, status);
                 }
             }
-            GattConnection conn = fitbitGatt.getConnection(gatt.getDevice());
+
             if (conn != null) {
-                List<BluetoothGattService> discoveredServices = gatt.getServices();
                 // since this is one of the events that could happen asynchronously, we will
                 // need to iterate through our connection listeners
+
                 for (ConnectionEventListener asyncConnListener : conn.getConnectionEventListeners()) {
                     TransactionResult.Builder builder = new TransactionResult.Builder();
                     builder.transactionName(GattClientDiscoverServicesTransaction.NAME);
@@ -320,17 +361,21 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicRead(gatt, characteristic, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onCharacteristicRead: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onCharacteristicRead: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
         handler.post(() -> {
-        for (GattClientListener listener : copy) {
-            if(listener.getDevice() != null && listener.getDevice().equals(gatt.getDevice())) {
-               listener.onCharacteristicRead(gatt, gattUtils.copyCharacteristic(characteristic), status);
+            for (GattClientListener listener : copy) {
+                if(listener.getDevice() != null && listener.getDevice().equals(gatt.getDevice())) {
+                    listener.onCharacteristicRead(gatt, gattUtils.copyCharacteristic(characteristic), status);
+                }
             }
-        }
         });
     }
 
@@ -338,8 +383,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicWrite(gatt, characteristic, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onCharacteristicWrite: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onCharacteristicWrite: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
@@ -357,43 +406,54 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt, characteristic);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.d("[%s] onCharacteristicChanged: [Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.d(
+                    "[%s] onCharacteristicChanged: [Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
         BluetoothDevice device = gatt.getDevice();
         final BluetoothGattCharacteristicCopy copyOfCharacteristic = gattUtils.copyCharacteristic(characteristic);
-        handler.post(() -> {
-            for (GattClientListener listener : copy) {
-                if (listener.getDevice() != null && listener.getDevice().equals(device)) {
-                    listener.onCharacteristicChanged(gatt, copyOfCharacteristic);
-                }
-            }
-            GattConnection conn = fitbitGatt.getConnection(gatt.getDevice());
-            if (conn != null) {
-                // since this is async, the result status is irrelevant so it will always be
-                // success because we received this data, as this is a snapshot of a live object
-                // we will need to copy the values into the tx result
-                TransactionResult result = new TransactionResult.Builder()
-                        .gattState(conn.getGattState())
-                        .characteristicUuid(copyOfCharacteristic.getUuid())
-                        .data(copyOfCharacteristic.getValue())
-                        .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS).build();
-                for (ConnectionEventListener asyncListener : conn.getConnectionEventListeners()) {
-                    asyncListener.onClientCharacteristicChanged(result, conn);
-                }
-            } else if (fitbitGatt.isSlowLoggingEnabled()){
-                Timber.v("[%s] Gatt was null, we could be mocking, if so we can't notify async", getDeviceMacFromGatt(gatt));
-            }
-        });
+        handler.post(
+                () -> {
+                    for (GattClientListener listener : copy) {
+                        if (listener.getDevice() != null && listener.getDevice().equals(device)) {
+                            listener.onCharacteristicChanged(gatt, copyOfCharacteristic);
+                        }
+                    }
+                    GattConnection conn = fitbitGatt.getConnection(gatt.getDevice());
+                    if (conn != null) {
+                        // since this is async, the result status is irrelevant so it will always be
+                        // success because we received this data, as this is a snapshot of a live object
+                        // we will need to copy the values into the tx result
+                        TransactionResult result =
+                                new TransactionResult.Builder()
+                                        .gattState(conn.getGattState())
+                                        .characteristicUuid(copyOfCharacteristic.getUuid())
+                                        .data(copyOfCharacteristic.getValue())
+                                        .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS)
+                                        .build();
+                        for (ConnectionEventListener asyncListener : conn.getConnectionEventListeners()) {
+                            asyncListener.onClientCharacteristicChanged(result, conn);
+                        }
+                    } else if (fitbitGatt.isSlowLoggingEnabled()) {
+                        Timber.v(
+                                "[%s] Gatt was null, we could be mocking, if so we can't notify async",
+                                getDeviceMacFromGatt(gatt));
+                    }
+                });
     }
 
     @Override
     public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
         super.onDescriptorRead(gatt, descriptor, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onDescriptorRead: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onDescriptorRead: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
@@ -411,8 +471,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
         super.onDescriptorWrite(gatt, descriptor, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onDescriptorWrite: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onDescriptorWrite: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
@@ -430,8 +494,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
         super.onReliableWriteCompleted(gatt, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onReliableWriteCompleted: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onReliableWriteCompleted: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
@@ -448,8 +516,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
         super.onReadRemoteRssi(gatt, rssi, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onReadRemoteRssi: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onReadRemoteRssi: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
@@ -466,8 +538,12 @@ public class GattClientCallback extends BluetoothGattCallback {
     public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
         super.onMtuChanged(gatt, mtu, status);
         if (fitbitGatt.isSlowLoggingEnabled()) {
-            Timber.v("[%s] onMtuChanged: Gatt Response Status %s", getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
-            Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
+            Timber.v(
+                    "[%s] onMtuChanged: Gatt Response Status %s",
+                    getDeviceMacFromGatt(gatt), GattStatus.getStatusForCode(status));
+            Timber.d(
+                    "[%s][Threading] Originally called on thread : %s",
+                    getDeviceMacFromGatt(gatt), Thread.currentThread().getName());
         }
         ArrayList<GattClientListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);
