@@ -20,7 +20,7 @@ jobs:
           java-version: 11
       - name: Test and Lint
         run: |
-          ./gradlew tDUT lintRelease
+          ./gradlew clean testDebug
       - name: Assemble
         run: |
           ./gradlew assembleRelease assembleDebug
