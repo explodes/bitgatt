@@ -632,7 +632,7 @@ class PeripheralScanner {
         broadcastIntent.setAction(SCANNED_DEVICE_ACTION);
         broadcastIntent.setClass(context, HandleIntentBasedScanResult.class);
         return PendingIntent.getBroadcast(context,
-            BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
@@ -682,7 +682,7 @@ class PeripheralScanner {
                 return null;
             }
             PendingIntent pending = PendingIntent.getBroadcast(context,
-                BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             // if a pending intent scan is underway we will clear it first as we now know that
             // this consumes gatt_ifs we can not have more than one ever running at a time
             // we can't rely on the boolean because we might have been killed between calls
@@ -842,7 +842,7 @@ class PeripheralScanner {
     }
 
     private synchronized boolean startScan(@Nullable Context context) {
-       return  startScan(context, scanSettings);
+        return  startScan(context, scanSettings);
     }
 
     /**
