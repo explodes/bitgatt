@@ -25,15 +25,15 @@ if(group == null) {
 }
 
 
-def releaseTag = System.getenv("RELEASE_TAG");
+def releaseTag = System.getenv("RELEASE_TAG")
 if (releaseTag != null && !releaseTag.isEmpty()) {
     if (releaseTag.startsWith("v")) {
-        releaseTag = releaseTag.substring(1);
+        releaseTag = releaseTag.substring(1)
     }
-    version = releaseTag;
-    project.properties.put("release.version", releaseTag);
+    version = releaseTag
+    project.properties.put("release.version", releaseTag)
 
-    println("Releasing with version " + version);
+    println("Releasing with version " + version)
 }
 
 def artifactPath = "$buildDir/outputs/aar"
@@ -90,7 +90,6 @@ ext {
     JUNIT_VERSION = '4.12'
     TEST_RUNNER_VERSION = '1.1.0'
     MOCKITO_VERSION = '3.6.0'
-    STETHO_VERSION = '1.5.1'
 }
 
 dependencies {
@@ -101,7 +100,6 @@ dependencies {
     implementation "androidx.multidex:multidex:$MULTIDEX_VERSION"
     implementation "androidx.appcompat:appcompat:$APP_COMPAT_VERSION"
     implementation "com.jakewharton.timber:timber:$TIMBER_VERSION"
-    debugImplementation "com.facebook.stetho:stetho:$STETHO_VERSION"
     testImplementation "junit:junit:$JUNIT_VERSION"
     testImplementation "androidx.test:runner:$TEST_RUNNER_VERSION"
     testImplementation "androidx.test:rules:$TEST_RUNNER_VERSION"
