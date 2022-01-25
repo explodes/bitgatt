@@ -8,30 +8,11 @@
 
 package com.fitbit.bluetooth.fbgatt;
 
-import androidx.test.core.app.ApplicationProvider;
-import com.fitbit.bluetooth.fbgatt.exception.BluetoothNotEnabledException;
-import com.fitbit.bluetooth.fbgatt.exception.MissingGattServerErrorException;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanSettings;
-import android.content.Context;
-import android.content.Intent;
-import android.os.ParcelUuid;
-import com.fitbit.bluetooth.fbgatt.util.BluetoothManagerFacade;
-import com.fitbit.bluetooth.fbgatt.util.BluetoothUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
-
-import static org.junit.Assert.*;
+import static android.Manifest.permission.BLUETOOTH_CONNECT;
+import static android.Manifest.permission.BLUETOOTH_SCAN;
+import static android.os.Build.VERSION_CODES.S;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -42,8 +23,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.robolectric.Shadows.shadowOf;
+
+import android.app.Application;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
+import android.content.Context;
+import android.content.Intent;
+import android.os.ParcelUuid;
+import androidx.test.core.app.ApplicationProvider;
+import com.fitbit.bluetooth.fbgatt.exception.BluetoothNotEnabledException;
+import com.fitbit.bluetooth.fbgatt.exception.MissingGattServerErrorException;
+import com.fitbit.bluetooth.fbgatt.exception.MissingPermission;
+import com.fitbit.bluetooth.fbgatt.util.BluetoothManagerFacade;
+import com.fitbit.bluetooth.fbgatt.util.BluetoothUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
+import org.robolectric.annotation.Config;
 
 /**
  * Responsible for testing the {@link FitbitGatt} apif
@@ -51,9 +56,7 @@ import static org.robolectric.Shadows.shadowOf;
  * Created by ilepadatescu on 09/20/2019
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(
-    minSdk = 21
-)
+@Config(minSdk = 21)
 public class FitbitGattTest {
     private BluetoothRadioStatusListener bluetoothRadioStatusListenerMock = mock(BluetoothRadioStatusListener.class);
 
@@ -70,8 +73,8 @@ public class FitbitGattTest {
 
     @Before
     public void before() {
+        Shadows.shadowOf((Application)ApplicationProvider.getApplicationContext()).grantPermissions(BLUETOOTH_SCAN, BLUETOOTH_CONNECT);
         context = ApplicationProvider.getApplicationContext();
-        // doReturn(scanIntentMock).when(dependencyProviderMock).getNewScanPendingIntent(any(), any());
         doReturn(bluetoothRadioStatusListenerMock).when(dependencyProviderMock).getNewBluetoothRadioStatusListener(any(), eq(false));
     }
 
@@ -90,6 +93,52 @@ public class FitbitGattTest {
 
         verify(scannerMock).setScanSettings(mock);
     }
+
+    @Test
+    @Config(minSdk = S)
+    public void testStartClientWithoutConnectPermission() {
+        Shadows.shadowOf((Application)ApplicationProvider.getApplicationContext()).denyPermissions(BLUETOOTH_CONNECT);
+
+        FitbitGatt.FitbitGattCallback cb = mock(FitbitGatt.FitbitGattCallback.class);
+        fitbitGatt.registerGattEventListener(cb);
+        fitbitGatt.startGattClient(context);
+        verify(cb).onGattClientStartError(any(MissingPermission.class));
+
+
+        assertFalse(fitbitGatt.isInitialized());
+        verifyNoMoreInteractions(cb);
+    }
+
+    @Test
+    @Config(minSdk = S)
+    public void testStartClientWithoutScamPermission() {
+        Shadows.shadowOf((Application)ApplicationProvider.getApplicationContext()).denyPermissions(BLUETOOTH_SCAN);
+
+        FitbitGatt.FitbitGattCallback cb = mock(FitbitGatt.FitbitGattCallback.class);
+        fitbitGatt.registerGattEventListener(cb);
+        fitbitGatt.startGattClient(context);
+        verify(cb).onGattClientStartError(any(MissingPermission.class));
+
+
+        assertFalse(fitbitGatt.isInitialized());
+        verifyNoMoreInteractions(cb);
+    }
+
+    @Test
+    @Config(minSdk = S)
+    public void testStartServerWithoutScanPermission() {
+        Shadows.shadowOf((Application)ApplicationProvider.getApplicationContext()).denyPermissions(BLUETOOTH_CONNECT);
+
+        FitbitGatt.FitbitGattCallback cb = mock(FitbitGatt.FitbitGattCallback.class);
+        fitbitGatt.registerGattEventListener(cb);
+        fitbitGatt.startGattServer(context);
+        verify(cb).onGattServerStartError(any(MissingPermission.class));
+
+
+        assertFalse(fitbitGatt.isInitialized());
+        verifyNoMoreInteractions(cb);
+    }
+
 
     @Test
     public void testGattClientStartWithBluetoothOff() {
