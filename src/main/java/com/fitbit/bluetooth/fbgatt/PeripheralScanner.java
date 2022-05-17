@@ -38,6 +38,7 @@ import static android.bluetooth.le.ScanCallback.SCAN_FAILED_APPLICATION_REGISTRA
 import static android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED;
 import static android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR;
 import static android.os.Build.VERSION_CODES.M;
+import static android.os.Build.VERSION_CODES.S;
 import static android.os.Build.VERSION_CODES.O;
 import static com.fitbit.bluetooth.fbgatt.FitbitGatt.atLeastSDK;
 
@@ -631,8 +632,13 @@ class PeripheralScanner {
         Intent broadcastIntent = new Intent(context, HandleIntentBasedScanResult.class);
         broadcastIntent.setAction(SCANNED_DEVICE_ACTION);
         broadcastIntent.setClass(context, HandleIntentBasedScanResult.class);
-        return PendingIntent.getBroadcast(context,
-                BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if(atLeastSDK(S)) {
+            flags |= PendingIntent.FLAG_MUTABLE;
+        }
+
+        return PendingIntent.getBroadcast(context, BACKGROUND_SCAN_REQUEST_CODE, broadcastIntent, flags);
     }
 
     /**
