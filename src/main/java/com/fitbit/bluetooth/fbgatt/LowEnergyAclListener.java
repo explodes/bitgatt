@@ -40,7 +40,6 @@ public class LowEnergyAclListener extends BroadcastReceiver {
     static AtomicInteger timesRegistered = new AtomicInteger(0);
 
     private IntentFilter[] filters = {
-        new IntentFilter(BluetoothDevice.ACTION_FOUND),
         new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED),
         new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED),
         new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED)
@@ -77,11 +76,6 @@ public class LowEnergyAclListener extends BroadcastReceiver {
             return;
         }
         FitbitBluetoothDevice fbDevice = new FitbitBluetoothDevice(device);
-        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-            Timber.i("%s Device found", fbDevice.getName());
-            // device was discovered in scan but we don't necessarily want to just add it unless
-            // it's connected to the phone
-        }
         if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
             Timber.i("%s Device is now connected", fbDevice.getName());
             // device was connected to the phone, does not mean device is connected to the
