@@ -14,6 +14,7 @@ import com.fitbit.bluetooth.fbgatt.GattState;
 import com.fitbit.bluetooth.fbgatt.GattTransactionCallback;
 import com.fitbit.bluetooth.fbgatt.TransactionResult;
 import android.bluetooth.BluetoothGattService;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,7 +42,8 @@ public class GetGattServerServicesTransaction extends GattServerTransaction {
     protected void transaction(GattTransactionCallback callback) {
         super.transaction(callback);
         getGattServer().setState(GattState.GETTING_SERVER_SERVICES);
-        List<BluetoothGattService> gattServices = getGattServer().getServer().getServices();
+        // create list copy to avoid CME if clients are iterating the list from different thread
+        List<BluetoothGattService> gattServices = new ArrayList<>(getGattServer().getServer().getServices());
         getGattServer().setState(GattState.GET_SERVER_SERVICES_SUCCESS);
         TransactionResult.Builder builder = new TransactionResult.Builder().transactionName(getName());
         builder.serverServices(gattServices)
