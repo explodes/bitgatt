@@ -65,14 +65,16 @@ public class GattServerConnectTransaction extends GattServerTransaction {
                 builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE)
                         .gattState(getGattServer().getGattState());
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                // reset state after communicating failure
+                getGattServer().resetState();
             }
         } else {
             getGattServer().setState(GattState.FAILURE_CONNECTING);
             builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE)
                     .gattState(getGattServer().getGattState());
             callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.DISCONNECTED);
+            // reset state after communicating failure
+            getGattServer().resetState();
         }
     }
 

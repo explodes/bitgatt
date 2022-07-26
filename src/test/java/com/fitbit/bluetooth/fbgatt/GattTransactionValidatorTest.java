@@ -66,7 +66,7 @@ public class GattTransactionValidatorTest {
 
     @Test
     public void testCanNotEnterTransactionWithBluetoothOff() {
-        conn.resetStates();
+        conn.resetState();
         conn.setState(GattState.BT_OFF);
         GattStateTransitionValidator<GattClientTransaction> validator = new GattStateTransitionValidator<GattClientTransaction>();
         GattConnectMockTransaction tx = new GattConnectMockTransaction(conn, GattState.CONNECTED, false);
@@ -76,7 +76,7 @@ public class GattTransactionValidatorTest {
 
     @Test
     public void testConnectionTransactionValidator() {
-        conn.resetStates();
+        conn.resetState();
         GattStateTransitionValidator<GattClientTransaction> validator = new GattStateTransitionValidator<GattClientTransaction>();
         GattConnectMockTransaction tx = new GattConnectMockTransaction(conn, GattState.CONNECTED, false);
         GattStateTransitionValidator.GuardState guardState = validator.checkTransaction(conn.getGattState(), tx);
@@ -85,7 +85,7 @@ public class GattTransactionValidatorTest {
 
     @Test
     public void testConnectionWhileDisconnectedTransactionValidator() {
-        conn.resetStates();
+        conn.resetState();
         GattStateTransitionValidator<GattClientTransaction> validator = new GattStateTransitionValidator<GattClientTransaction>();
         GattConnectMockTransaction tx = new GattConnectMockTransaction(conn, GattState.CONNECTED, false);
         GattStateTransitionValidator.GuardState guardState = validator.checkTransaction(conn.getGattState(), tx);
@@ -113,7 +113,7 @@ public class GattTransactionValidatorTest {
     @Test
     @Ignore
     public void testAnythingOtherThanConnectWhileDisconnectedTransactionValidator() {
-        conn.resetStates();
+        conn.resetState();
         GattStateTransitionValidator<GattClientTransaction> validator = new GattStateTransitionValidator<GattClientTransaction>();
         ReadGattCharacteristicMockTransaction tx = new ReadGattCharacteristicMockTransaction(conn,
                 GattState.READ_CHARACTERISTIC_SUCCESS,
@@ -128,7 +128,7 @@ public class GattTransactionValidatorTest {
 
     @Test
     public void testSetStateInErrorConditionValidatorTest() {
-        conn.resetStates();
+        conn.resetState();
         conn.setState(GattState.WRITE_CHARACTERISTIC_FAILURE);
         GattStateTransitionValidator<GattClientTransaction> validator = new GattStateTransitionValidator<GattClientTransaction>();
         SetClientConnectionStateTransaction tx = new SetClientConnectionStateTransaction(conn, GattState.GATT_CONNECTION_STATE_SET_SUCCESSFULLY, GattState.IDLE);
@@ -138,7 +138,7 @@ public class GattTransactionValidatorTest {
 
     @Test
     public void testServerDisconnectionTransactionValidator() {
-        conn.resetStates();
+        conn.resetState();
         conn.setState(GattState.CONNECTED);
         GattStateTransitionValidator<GattServerTransaction> validator = new GattStateTransitionValidator<GattServerTransaction>();
         GattServerDisconnectMockTransaction tx = new GattServerDisconnectMockTransaction(serverConnection, GattState.DISCONNECTED, device, false);
@@ -149,7 +149,7 @@ public class GattTransactionValidatorTest {
     @Test
     @Ignore
     public void testSettingTransactionTimeout(){
-        conn.resetStates();
+        conn.resetState();
         conn.setState(GattState.CONNECTED);
         WriteGattCharacteristicMockTransaction writeGattCharacteristicMockTransaction = new WriteGattCharacteristicMockTransaction(conn, GattState.WRITE_CHARACTERISTIC_SUCCESS, new BluetoothGattCharacteristic(UUID.randomUUID(),
                 BluetoothGattCharacteristic.PERMISSION_READ,

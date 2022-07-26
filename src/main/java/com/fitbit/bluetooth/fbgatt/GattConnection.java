@@ -53,12 +53,14 @@ public class GattConnection implements Closeable {
     private @NonNull Handler mainHandler;
     private final FitbitGatt fitbitGatt = FitbitGatt.getInstance();
 
+    private static GattState DEFAULT_STATE = GattState.DISCONNECTED;
+
     public GattConnection(FitbitBluetoothDevice device, Looper mainLooper) {
         this.device = device;
         this.guard = new GattStateTransitionValidator<GattClientTransaction>();
         this.mockServices = new ArrayList<>(1);
         this.clientQueue = new TransactionQueueController(this);
-        this.state = GattState.DISCONNECTED;
+        this.state = DEFAULT_STATE;
         this.disconnectedTTL = new AtomicLong(FitbitGatt.MAX_TTL);
         this.mainHandler = new Handler(mainLooper);
     }
@@ -216,8 +218,11 @@ public class GattConnection implements Closeable {
         return guard.checkTransaction(getGattState(), tx);
     }
 
-    void resetStates() {
-        this.setState(GattState.DISCONNECTED);
+    /**
+     * Reset to default connection state
+     */
+    public void resetState() {
+        this.setState(DEFAULT_STATE);
     }
 
     @VisibleForTesting

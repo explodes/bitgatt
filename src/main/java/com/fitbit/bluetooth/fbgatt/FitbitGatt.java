@@ -1470,10 +1470,10 @@ public class FitbitGatt implements PeripheralScanner.TrackerScannerListener, Blu
                         if (serverConnection != null) {
                             // We have a new server instance we need to replace it in the GattServerConnection
                             serverConnection.close();
-                            serverConnection.setState(GattState.IDLE);
+                            serverConnection.resetState();
                         }
                         setGattServerConnection(new GattServerConnection(gattServer, context.getMainLooper()));
-                        serverConnection.setState(GattState.IDLE);
+                        serverConnection.resetState();
                         callback.onGattServerStatus(true);
                         isGattServerStarting.set(false);
                         Timber.tag("FitbitGattServer").v("Gatt server successfully opened");
@@ -1663,6 +1663,7 @@ public class FitbitGatt implements PeripheralScanner.TrackerScannerListener, Blu
         }
     }
 
+    @Nullable
     public GattServerConnection getServer() {
         return serverConnection;
     }

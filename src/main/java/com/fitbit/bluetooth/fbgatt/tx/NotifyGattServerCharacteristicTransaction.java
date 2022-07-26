@@ -71,7 +71,7 @@ public class NotifyGattServerCharacteristicTransaction extends GattServerTransac
                     .gattState(getGattServer().getGattState());
             mainThreadHandler.post(() -> {
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
                 // we want to apply this strategy to every phone, so we will provide an empty target android
                 // device
                 Strategy strategy = strategyProvider.
@@ -96,13 +96,12 @@ public class NotifyGattServerCharacteristicTransaction extends GattServerTransac
         if(status == BluetoothGatt.GATT_SUCCESS) {
             getGattServer().setState(GattState.NOTIFY_CHARACTERISTIC_SUCCESS);
             builder.resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
-            callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
         } else {
             getGattServer().setState(GattState.NOTIFY_CHARACTERISTIC_FAILURE);
             builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
-            callCallbackWithTransactionResultAndRelease(callback, builder.build());
         }
+        callCallbackWithTransactionResultAndRelease(callback, builder.build());
+        getGattServer().resetState();
     }
 
     @Override

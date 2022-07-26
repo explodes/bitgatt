@@ -93,6 +93,8 @@ class GattServerCallback extends BluetoothGattServerCallback {
         if (fitbitGatt.isSlowLoggingEnabled()) {
             Timber.v("[%s] onConnectionStateChange: Gatt Response Status %s", getDeviceMacFromDevice(device), GattStatus.getStatusForCode(status));
             Timber.d("[%s][Threading] Originally called on thread : %s", getDeviceMacFromDevice(device), Thread.currentThread().getName());
+        } else {
+            Timber.v("onConnectionStateChange: Gatt Response Status %s", GattStatus.getStatusForCode(status));
         }
         ArrayList<GattServerListener> copy = new ArrayList<>(listeners.size());
         copy.addAll(listeners);

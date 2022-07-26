@@ -83,7 +83,7 @@ public class WriteGattServerCharacteristicDescriptorValueTransaction extends Gat
                         .characteristicUuid(localCharacteristic.getUuid())
                         .descriptorUuid(localDescriptor.getUuid());
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
             } else {
                 // failure
                 respondWithError(localCharacteristic, localDescriptor, callback);
@@ -111,7 +111,7 @@ public class WriteGattServerCharacteristicDescriptorValueTransaction extends Gat
                 .characteristicUuid(characteristic == null ? null : characteristic.getUuid())
                 .descriptorUuid(descriptor == null ? null : descriptor.getUuid());
         callCallbackWithTransactionResultAndRelease(callback, builder.build());
-        getGattServer().setState(GattState.IDLE);
+        getGattServer().resetState();
     }
 
     @Override

@@ -53,7 +53,7 @@ public class CloseGattServerTransaction extends GattServerTransaction {
                 .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
             mainThreadHandler.post(() -> {
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
             });
         } else {
             BluetoothUtils bluetoothUtils = new BluetoothUtils();
@@ -67,7 +67,7 @@ public class CloseGattServerTransaction extends GattServerTransaction {
                     .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
                 mainThreadHandler.post(() -> {
                     callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                    getGattServer().setState(GattState.IDLE);
+                    getGattServer().resetState();
                 });
             } catch (NullPointerException ex) {
                 Timber.w("As the client close can sometimes NPE internally, it is reasonable to assume that a similar thing occurred for the server");
@@ -76,7 +76,7 @@ public class CloseGattServerTransaction extends GattServerTransaction {
                     .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
                 mainThreadHandler.post(() -> {
                     callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                    getGattServer().setState(GattState.IDLE);
+                    getGattServer().resetState();
                 });
             }
         }

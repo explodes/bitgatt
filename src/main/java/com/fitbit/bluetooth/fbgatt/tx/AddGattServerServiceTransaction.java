@@ -71,7 +71,7 @@ public class AddGattServerServiceTransaction extends GattServerTransaction {
                         .serviceUuid(service.getUuid())
                         .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
                 return;
             }
             boolean success = false;
@@ -92,7 +92,7 @@ public class AddGattServerServiceTransaction extends GattServerTransaction {
                     .serviceUuid(service.getUuid())
                     .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
             }
         }
     }
@@ -107,17 +107,15 @@ public class AddGattServerServiceTransaction extends GattServerTransaction {
             builder.gattState(getGattServer().getGattState())
                     .serviceUuid(service.getUuid())
                     .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
-            callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
         } else {
             getGattServer().setState(GattState.ADD_SERVICE_FAILURE);
             Timber.e("The gatt service could not be added: %s", service.getUuid());
             builder.gattState(getGattServer().getGattState())
                     .serviceUuid(service.getUuid())
                     .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
-            callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
         }
+        callCallbackWithTransactionResultAndRelease(callback, builder.build());
+        getGattServer().resetState();
     }
 
     /**
@@ -127,7 +125,8 @@ public class AddGattServerServiceTransaction extends GattServerTransaction {
      */
 
     private boolean doesGattServerServiceAlreadyExist(BluetoothGattService service) {
-        return FitbitGatt.getInstance().getServer().getServer().getService(service.getUuid()) != null;
+        GattServerConnection connection = FitbitGatt.getInstance().getServer();
+        return connection!= null && connection.getServer().getService(service.getUuid()) != null;
     }
 
     @Override

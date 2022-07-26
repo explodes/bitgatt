@@ -14,14 +14,14 @@ import android.bluetooth.BluetoothProfile;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import timber.log.Timber;
 
 /**
@@ -42,11 +42,13 @@ public class GattServerConnection implements Closeable {
     private Handler mainHandler;
     private boolean mockMode;
 
+    private static GattState DEFAULT_STATE = GattState.IDLE;
+
     protected GattServerConnection(@Nullable BluetoothGattServer server, Looper looper) {
         this.server = server;
         this.serverQueue = new TransactionQueueController();
         this.guard = new GattStateTransitionValidator<>();
-        this.state = GattState.IDLE;
+        this.state = DEFAULT_STATE;
         this.mainHandler = new Handler(looper);
     }
 
@@ -87,9 +89,11 @@ public class GattServerConnection implements Closeable {
         this.state = state;
     }
 
-    @SuppressWarnings("unused") // API Method
-    void resetStates(){
-        this.setState(GattState.DISCONNECTED);
+    /**
+     * Reset to default connection state
+     */
+    public void resetState(){
+        this.setState(DEFAULT_STATE);
     }
 
     @VisibleForTesting

@@ -52,7 +52,7 @@ public class RemoveGattServerServicesTransaction extends GattServerTransaction {
         builder.gattState(getGattServer().getGattState());
         mainThreadHandler.post(() -> {
             callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
+            getGattServer().resetState();
         });
     }
 

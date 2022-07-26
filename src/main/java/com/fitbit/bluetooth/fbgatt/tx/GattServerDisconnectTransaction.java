@@ -63,6 +63,7 @@ public class GattServerDisconnectTransaction extends GattServerTransaction {
                 builder.gattState(getGattServer().getGattState())
                         .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
+                getGattServer().resetState();
             } else if (newState == BluetoothProfile.STATE_CONNECTED) {
                 getGattServer().setState(GattState.CONNECTED);
                 builder.gattState(getGattServer().getGattState())
