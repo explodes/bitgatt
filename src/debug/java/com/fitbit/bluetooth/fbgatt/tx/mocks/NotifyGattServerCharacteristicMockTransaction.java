@@ -62,7 +62,7 @@ public class NotifyGattServerCharacteristicMockTransaction extends NotifyGattSer
                     }
                     getGattServer().setState(GattState.NOTIFY_CHARACTERISTIC_FAILURE);
                     builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
-                    getGattServer().setState(GattState.IDLE);
+                    getGattServer().resetState();
                     Strategy strategy = strategyProvider.
                             getStrategyForPhoneAndGattConnection(null, null,
                                     Situation.TRACKER_WENT_AWAY_DURING_GATT_OPERATION);

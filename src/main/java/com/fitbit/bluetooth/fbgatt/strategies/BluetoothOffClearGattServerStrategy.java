@@ -82,7 +82,7 @@ public class BluetoothOffClearGattServerStrategy extends Strategy {
             } catch (NullPointerException e) {
                 Timber.w(e, "There was an internal stack NPE, the Android BluetoothService probably crashed or already shut down");
             }
-            serverConn.setState(GattState.IDLE);
+            serverConn.resetState();
         });
     }
 }

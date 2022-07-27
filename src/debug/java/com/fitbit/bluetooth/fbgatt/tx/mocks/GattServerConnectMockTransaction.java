@@ -46,14 +46,13 @@ public class GattServerConnectMockTransaction extends GattServerConnectTransacti
                 getGattServer().setState(GattState.FAILURE_CONNECTING);
                 builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE)
                         .gattState(getGattServer().getGattState());
-                callCallbackWithTransactionResultAndRelease(callback, builder.build());
             } else {
                 getGattServer().setState(GattState.CONNECTED);
                 builder.resultStatus(TransactionResult.TransactionResultStatus.SUCCESS)
                         .gattState(getGattServer().getGattState());
-                callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
             }
+            callCallbackWithTransactionResultAndRelease(callback, builder.build());
+            getGattServer().resetState();
         }, REASONABLE_AMOUNT_OF_TIME_FOR_CONNECT);
     }
 }

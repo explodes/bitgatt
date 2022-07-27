@@ -78,7 +78,7 @@ public class SendGattServerResponseTransaction extends GattServerTransaction {
                     offset(offset);
             mainThreadHandler.post(() -> {
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
             });
         } else {
             getGattServer().setState(GattState.SEND_SERVER_RESPONSE_FAILURE);
@@ -90,7 +90,7 @@ public class SendGattServerResponseTransaction extends GattServerTransaction {
                     offset(offset);
             mainThreadHandler.post(() -> {
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
                 // we want to apply this strategy to every phone, so we will provide an empty target android
                 // device
                 Strategy strategy = strategyProvider.

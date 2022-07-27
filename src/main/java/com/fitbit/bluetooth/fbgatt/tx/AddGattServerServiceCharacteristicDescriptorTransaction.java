@@ -112,7 +112,7 @@ public class AddGattServerServiceCharacteristicDescriptorTransaction extends Gat
                 .descriptorUuid(descriptor.getUuid())
                 .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
         callCallbackWithTransactionResultAndRelease(callback, builder.build());
-        getGattServer().setState(GattState.IDLE);
+        getGattServer().resetState();
     }
 
     /**

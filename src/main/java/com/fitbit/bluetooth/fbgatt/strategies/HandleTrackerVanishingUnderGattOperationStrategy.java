@@ -8,18 +8,19 @@
 
 package com.fitbit.bluetooth.fbgatt.strategies;
 
+import android.bluetooth.BluetoothGatt;
+import androidx.annotation.Nullable;
 import com.fitbit.bluetooth.fbgatt.AndroidDevice;
 import com.fitbit.bluetooth.fbgatt.FitbitGatt;
 import com.fitbit.bluetooth.fbgatt.GattConnection;
+import com.fitbit.bluetooth.fbgatt.GattServerConnection;
 import com.fitbit.bluetooth.fbgatt.GattState;
-import android.bluetooth.BluetoothGatt;
 import java.util.concurrent.TimeUnit;
-import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 /**
  * In the case that we have a tracker that has disconnected, in the middle of a write / read /
- * server response, we should mark that connection as disconnected and force the timeout wait with
+ * server response, we should reset that connection and force the timeout wait with
  * a 133 unknown ( connection interface unknown ) gatt status.
  */
 
@@ -49,9 +50,10 @@ public class HandleTrackerVanishingUnderGattOperationStrategy extends Strategy {
         Timber.v("Waiting %dms for the client_if to dump", WAIT_TIME_FOR_DISCONNECTION);
         if (connection != null) {
             connection.getMainHandler().postDelayed(() -> {
-                connection.setState(GattState.DISCONNECTED);
-                if (FitbitGatt.getInstance().getServer() != null) {
-                    FitbitGatt.getInstance().getServer().setState(GattState.DISCONNECTED);
+                connection.resetState();
+                GattServerConnection server = FitbitGatt.getInstance().getServer();
+                if (server != null) {
+                    server.resetState();
                 }
                 Timber.v("Strategy is done, gatt can be used again");
             }, WAIT_TIME_FOR_DISCONNECTION);

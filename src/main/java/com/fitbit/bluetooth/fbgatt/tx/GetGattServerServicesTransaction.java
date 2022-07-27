@@ -51,7 +51,7 @@ public class GetGattServerServicesTransaction extends GattServerTransaction {
                 .gattState(getGattServer().getGattState());
         mainThreadHandler.post(() -> {
             callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
+            getGattServer().resetState();
         });
     }
 

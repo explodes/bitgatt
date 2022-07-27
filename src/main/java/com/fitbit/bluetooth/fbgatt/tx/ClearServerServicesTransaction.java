@@ -41,7 +41,7 @@ public class ClearServerServicesTransaction extends GattServerTransaction {
                 .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
         mainThreadHandler.post(() -> {
             callCallbackWithTransactionResultAndRelease(callback, builder.build());
-            getGattServer().setState(GattState.IDLE);
+            getGattServer().resetState();
         });
     }
 

@@ -43,21 +43,16 @@ public class SendGattServerResponseMockTransaction extends SendGattServerRespons
             if (shouldFail) {
                 getGattServer().setState(GattState.SEND_SERVER_RESPONSE_FAILURE);
                 builder.resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
-                builder.gattState(getGattServer().getGattState()).
-                        data(value).
-                        requestId(requestId).
-                        offset(offset);
-                callCallbackWithTransactionResultAndRelease(callback, builder.build());
             } else {
                 getGattServer().setState(GattState.SEND_SERVER_RESPONSE_SUCCESS);
                 builder.resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
-                builder.gattState(getGattServer().getGattState()).
-                        data(value).
-                        requestId(requestId).
-                        offset(offset);
-                callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
             }
+            builder.gattState(getGattServer().getGattState()).
+                    data(value).
+                    requestId(requestId).
+                    offset(offset);
+            callCallbackWithTransactionResultAndRelease(callback, builder.build());
+            getGattServer().resetState();
         }, REASONABLE_TIME_FOR_SEND_RESPONSE);
     }
 }

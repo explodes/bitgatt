@@ -56,8 +56,8 @@ public class AddGattServerServiceMockTransaction extends AddGattServerServiceTra
                         .gattState(getGattServer().getGattState())
                         .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
                 callCallbackWithTransactionResultAndRelease(callback, transactionResultBuilder.build());
-                getGattServer().setState(GattState.IDLE);
             }
+            getGattServer().resetState();
         }, REASONABLE_AMOUNT_OF_TIME_FOR_ADDING_SERVICE);
     }
 

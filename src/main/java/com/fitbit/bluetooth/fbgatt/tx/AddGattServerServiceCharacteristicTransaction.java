@@ -70,7 +70,7 @@ public class AddGattServerServiceCharacteristicTransaction extends GattServerTra
                             .characteristicUuid(characteristic.getUuid())
                             .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
                     callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                    getGattServer().setState(GattState.IDLE);
+                    getGattServer().resetState();
                     return;
                 }
                 addCriticalDescriptorsIfNecessary(characteristic);
@@ -84,7 +84,7 @@ public class AddGattServerServiceCharacteristicTransaction extends GattServerTra
                             .characteristicUuid(characteristic.getUuid())
                             .resultStatus(TransactionResult.TransactionResultStatus.SUCCESS);
                     callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                    getGattServer().setState(GattState.IDLE);
+                    getGattServer().resetState();
                 } else {
                     respondWithError("Couldn't add the characteristic to the local gatt service", callback);
                 }
@@ -124,7 +124,7 @@ public class AddGattServerServiceCharacteristicTransaction extends GattServerTra
         builder.gattState(getGattServer().getGattState())
                 .resultStatus(TransactionResult.TransactionResultStatus.FAILURE);
         callCallbackWithTransactionResultAndRelease(callback, builder.build());
-        getGattServer().setState(GattState.IDLE);
+        getGattServer().resetState();
     }
 
     /**

@@ -71,7 +71,7 @@ public class WriteGattServerCharacteristicValueTransaction extends GattServerTra
                         .serviceUuid(service.getUuid())
                         .characteristicUuid(localCharacteristic.getUuid());
                 callCallbackWithTransactionResultAndRelease(callback, builder.build());
-                getGattServer().setState(GattState.IDLE);
+                getGattServer().resetState();
             } else {
                 // failure
                 respondWithError(localCharacteristic, callback);
@@ -98,7 +98,7 @@ public class WriteGattServerCharacteristicValueTransaction extends GattServerTra
                 .serviceUuid(service.getUuid())
                 .characteristicUuid(characteristic == null ? null : characteristic.getUuid());
         callCallbackWithTransactionResultAndRelease(callback, builder.build());
-        getGattServer().setState(GattState.IDLE);
+        getGattServer().resetState();
     }
 
     @Override
