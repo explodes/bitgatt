@@ -109,7 +109,7 @@ public class FitbitGatt implements PeripheralScanner.TrackerScannerListener, Blu
     private GattClientCallback clientCallback;
     @Nullable
     private PeripheralScanner peripheralScanner;
-    @Nullable
+    @NonNull
     private AlwaysConnectedScanner alwaysConnectedScanner;
     @VisibleForTesting
     LowEnergyAclListener aclListener;
