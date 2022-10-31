@@ -29,7 +29,7 @@ all Android gatt operations with the aim to make Android BLE development
 as bomb-proof as possible.
 
 We created a blog post to explain further why we need such a significant
-abstraction on top of the Android Low Energy API : [eng.fitbit.com/what-is-bitgatt-and-why-do-we-need-it/](https://eng.fitbit.com/what-is-bitgatt-and-why-do-we-need-it/)
+abstraction on top of the Android Low Energy API : [medium.com/fitbit-tech-blog/what-is-bitgatt-and-why-do-we-need-it-b884ba2ebf6d](https://medium.com/fitbit-tech-blog/what-is-bitgatt-and-why-do-we-need-it-b884ba2ebf6d)
 
 ### Setting up the dependency
 
